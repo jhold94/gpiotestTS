@@ -1,3 +1,33 @@
+#include <assert.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+
+int main(int argc, char **argv)
+{
+        volatile unsigned int *mxlradcregs;
+        volatile unsigned int *mxhsadcregs;
+        volatile unisigned int *mxclkctrlregs;
+        unsigned int i, x;
+        unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
+        int devmem;
+        
+        devmem = open("/dev/mem", O_RDWR|O_SYNC);
+        assert(devmem != -1);
+        
+        // LRADC
+        mxlradcregs = (unsigned 
+  
+
+
+
+
+
+
 
                  
 
