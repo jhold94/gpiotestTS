@@ -250,7 +250,7 @@ void usage(char **argv) {
                 "  -x, --getadcV1               Return the input mV value of ADC1\n"
                 "  -y, --getadcV2               Return the input mV value of ADC2\n"
                 "  -z, --getadcV3               Return the input mV value of ADC3\n"
-                "\n"
+                "\n",
                 argv[0]
         );
 }
@@ -262,6 +262,8 @@ int main(int argc, char **argv)
         int opt_info = 0, opt_getmac = 0;
         int opt_cputemp = 0;
         int opt_dac0 = 0, opt_dac1 = 0, opt_dac2 = 0, opt_dac3 = 0;
+        int opt_mAadc0 = 0, opt_mAadc1 = 0, opt_mAadc2 = 0, opt_mAadc3 = 0;
+        int opt_mVadc0 = 0, opt_mVadc1 = 0, opt_mVadc2 = 0, opt_mVadc3 = 0;
         char *opt_mac = NULL;
         int model;
         uint8_t pokeval = 0;
