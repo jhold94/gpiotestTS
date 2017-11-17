@@ -235,8 +235,8 @@ int gpio_export(int gpio)
                 }
                 close(efd);
         } else {
-                // If we can;t open the export file, we probably
-                // don;t have any gpio permissions
+                // If we can't open the export file, we probably
+                // don't have any gpio permissions
                 return -1;
         }
         return 0;
@@ -367,42 +367,35 @@ int main(int argc, char **argv)
 {
         int c, i;
         uint16_t addr = 0x0;
-        int opt_addr = 0;
-        int opt_poke = 0, opt_peek = 0, opt_auto485 = -1;
-        int opt_set = 0, opt_get = 0, opt_dump = 0;
-        int opt_info = 0, opt_setmac = 0, opt_getmac = 0;
-        int opt_cputemp = 0, opt_modbuspoweron = 0, opt_modbuspoweroff = 0;
+        int opt_info = 0, opt_getmac = 0;
+        int opt_cputemp = 0;
         int opt_dac0 = 0, opt_dac1 = 0, opt_dac2 = 0, opt_dac3 = 0;
         char *opt_mac = NULL;
-        int baud = 0;
         int model;
         uint8_t pokeval = 0;
-        char *uartmode = 0;
-        struct cbarpin *cbar_inputs, *cbar_outputs;
-        int cbar_size, cbar_mask;
         
         static struct option long_options[] = {
-                { "help", 1, 0, 'h' },
-                { "info", 1, 0, 'i' },
-                { "cputemp", 1, 0, 't' },
-                { "getmac", 1, 0, 'm' },
+                { "help", 0, 0, 'h' },
+                { "info", 0, 0, 'i' },
+                { "cputemp", 0, 0, 't' },
+                { "getmac", 0, 0, 'm' },
                 { "ddrout", 1, 0, 'o' },
-                { "ddrin", 0, 0, 't' },
+                { "ddrin", 1, 0, 't' },
                 { "sethigh", 1, 0, 'j' },
                 { "setlow", 1, 0, 'l' },
                 { "dac0", 1, 0, 'a' },
-                { "dac1", 0, 0, 'b' },
-                { "dac2", 0, 0, 'c' },
-                { "dac3", 0, 0, 'd' },
-                { "getin", 0, 0, 'g' },
+                { "dac1", 1, 0, 'b' },
+                { "dac2", 1, 0, 'c' },
+                { "dac3", 1, 0, 'd' },
+                { "getin", 1, 0, 'g' },
                 { "getadcA0", 0, 0, 'p' },
-                { "getadcA1", 1, 0, 'q' },
+                { "getadcA1", 0, 0, 'q' },
                 { "getadcA2", 0, 0, 'r' },
                 { "getadcA3", 0, 0, 's' },
                 { "getadcV0", 0, 0, 'w' },
                 { "getadcV1", 0, 0, 'x' },
-                { "getadcV2", 1, 0, 'y' },
-                { "getadcV3", 1, 0, 'z' },
+                { "getadcV2", 0, 0, 'y' },
+                { "getadcV3", 0, 0, 'z' },
                 { 0, 0, 0, 0 }
         };
         
@@ -434,25 +427,27 @@ int main(int argc, char **argv)
                                 opt_getmac = 1;
                                 break;
                         case 'o':
-                                gpio = atio(optarg);
+                                gpio = atoi(optarg);
                                 gpio_export(gpio);
                                 gpio_direction(gpio, 1);
                                 gpio_unexport(gpio);
                                 break;
                         case 'e':
-                                gpio = atio(optarg);
+                                gpio = atoi(optarg);
                                 gpio_export(gpio);
                                 gpio_direction(gpio, 0);
                                 gpio_unexport(gpio);
                                 break;
+                     
+                     // Digital and Analog Outputs
                         case 'j':
-                                gpio = atio(optarg);
+                                gpio = atoi(optarg);
                                 gpio_export(gpio);
                                 gpio_write(gpio, 1);
                                 gpio_unexport(gpio);
                                 break;
                         case 'l':
-                                gpio = atio(optarg);
+                                gpio = atoi(optarg);
                                 gpio_export(gpio);
                                 gpio_write(gpio, 0);
                                 gpio_unexport(gpio);
@@ -469,8 +464,10 @@ int main(int argc, char **argv)
                         case 'd':
                                 opt_dac3 = ((strtoul(optarg, NULL, 0) & 0xfff)<<1)|0x1;
                                 break;
+                                
+                     // Digital and Analog Inputs
                         case 'g':
-                                gpio = atio(optarg);
+                                gpio = atoi(optarg);
                                 gpio_export(gpio);
                                 printf("gpio%d=%d\n", gpio, gpio_read(gpio));
                                 gpio_unexport(gpio);
@@ -507,7 +504,7 @@ int main(int argc, char **argv)
         
         twifd = fpga_init(NULL< 0);
         if(twifd == -1) {
-                perror("Can;t open FPGA I2C bus");
+                perror("Can't open FPGA I2C bus");
                 return 1;
         }
         
@@ -516,105 +513,6 @@ int main(int argc, char **argv)
                 gpio_export(44);
                 printf("bootmode=0x%X\n", gpio_read(44) ? 1:0);
                 printf("fpga_revision=0x%X\n", fpeek8(twifd, 0x7F));
-        }
-        
-        if(opt_get) {
-                for(i = 0; cbar_inputs[i].name != 0; i++)
-                {
-                        uint8_t mode = fpeek8(twifd, cbar_inputs[i].addr) >> (8 - cbar_size);
-                        printf("%s=%s\n", cbar_inputs[i].name, cbar_outputs[mode].name);
-                }
-        }
-        
-        if(opt_set) {
-                for(i = 0; cbar_inputs[i].name != 0; i++)
-                {
-                        char *value = getenv(cbar_inputs[i].name);
-                        int j;
-                        if(value != NULL) {
-                                for(j = 0; cbar_outputs[j].name != 0; j++) {
-                                        if(strcmp(cbar_outputs[j].name, value) == 0) {
-                                                int mode = cbar_outputs[j].addr;
-                                                uint8_t val = fpeek8(twifd, cbar_inputs[i].addr);
-                                                fpoke8(twifd, cbar_inputs[i].addr,
-                                                       (mode << (8 - cbar_size)) | (val & cbar_mask));
-                                                break;
-                                        }
-                                }
-                                if(cbar_outputs[i].name == 0) {
-                                        fprintf(stderr, "Invalid value \"$s\" for input %s\n",
-                                                value, cbar_inputs[i].name);
-                                }
-                        }
-                }
-        }
-        
-        if(opt_dump) {
-                i = 0;
-                printf("%13s (DIR) (VAL) FPGA Output\n", "FPGA Pad");
-                for(i = 0; cbar_inputs[i].name != 0; i++)
-                {
-                        uint8_t value = fpeek8(twifd, cbar_inputs[i].addr);
-                        uint8_t mode = value >> (8 - cbar_size);
-                        char *dir = value * 0x1 ? "out" : "in";
-                        int val;
-                        
-                        // 4900 uses 5 bits for cbar, 7970/7990 use  and share
-                        // the data bit for input.output
-                        if(value & 0x1 || cbar_size == 6) {
-                                val = value & 0x2 ? 1 : 0;
-                        } else {
-                                val = value & 0x4 ? 1 : 0;
-                        }
-                        printf("%13s (%3s) (%3d) %s\n",
-                               cbar_inputs[i].name,
-                               dir,
-                               val,
-                               cbar_outputs[mode].name);
-                }
-        }
-        
-        if(opt_modbuspoweron) {
-                gpio_export(45);
-                gpio_export(46);
-                gpio_export(47);
-                
-                gpio_write(45, 0);
-                gpio_write(47, 0);
-                
-                gpio_direction(45, 1);
-                gpio_direction(46, 0);
-                gpio_direction(47, 1);
-                
-                gpio_write(47, 0);
-                usleep(10000);
-                
-                if(gpio_read(46)) {
-                        gpio_write(47,1);
-                        printf("modbuspoweron=0\n");
-                } else {
-                        gpio_write(47, 1);
-                        gpio_write(45, 1);
-                        printf("modbuspoweron=1\n");
-                }
-        }
-        
-        if(opt_modbuspoweroff) {
-                gpio_export(45);
-                gpio_write(45, 0);
-                gpio_direction(45, 1);
-        }
-        
-        if(opt_poke) {
-                fpoke8(twifd, addr, pokeval);
-        }
-        
-        if(opt_peek) {
-                printf("0x%X\n", fpeek8(twifd, addr));
-        }
-        
-        if(opt_auto485 > -1) {
-                auto485_en(opt_auto485, baud, uartmode);
         }
         
         if(opt_cputemp) {
@@ -650,38 +548,6 @@ int main(int argc, char **argv)
                   abs(temp[0] % 10000));
                 
                 munmap((void *)mxlradcregs, getpagesize());
-                close(devmem);
-        }
-        
-        if(opt_setmac) {
-                /* This uses onetime programmable memory. */
-                unsigned int a, b, c;
-                int r, devmem;
-                volatile unsigned int *mxocotpregs;
-                
-                devmem = open("/dev/mem", O_RDWR|O_SYNC);
-                assert(devmem != -1);
-                
-                r = sscanf(opt_mac, "%*x:%*x:%*x:%x:%x:%x", &a, &b, &c);
-                assert(r == 3); /* XXX: user arg problem */
-                
-                mxocotpregs = (unsigned int *) mmap(0, getpagesize(),
-                  PROT_READ | PROT_WRITE, MAP_SHARED, devmem, 0x8002C000);
-                
-                mxocotpregs[0x08/4] = 0x200;
-                mxocotpregs[0x0/4] = 0x1000;
-                while(mxocotpregs[0x0/4] & 0x100); //Check busy flag
-                if(mxocotpregs[0x20/4] & (0xFFFFFF)) {
-                        printf("MAC address previously set, cannot set\n");
-                } else {
-                        assert(a < 0x100);
-                        assert(b < 0x100);
-                        assert(c < 0x100);
-                        mxocotpregs[0x0/4] = 0x3E770000;
-                        mxocotpregs[0x10/4] = (a<<16|b<<8|c);
-                }
-                mxocotpregs[0x0/4] = 0x0;
-                munmap((void *)mxocotpregs, getpagesize());
                 close(devmem);
         }
         
@@ -751,6 +617,346 @@ int main(int argc, char **argv)
                 buf[1] = ((opt_dac3 >> 1) & 0xff);
                 fpoke8(twifd, 0x34, buf[0]);
                 fpoke8(twifd, 0x35, buf[1]);
+        }
+        
+        if(opt_mAadc0) {
+                volatile unsigned int *mxlradcregs;
+                volatile unsigned int *mxhsadcregs;
+                volatile unisigned int *mxclkctrlregs;
+                unsigned int i, x, meas_mV;
+                unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
+                int devmem;
+        
+                devmem = open("/dev/mem", O_RDWR|O_SYNC);
+                assert(devmem != -1);
+        
+                // LRADC
+                mxlradcregs = (unsigned int *) mmap(0, getpagesize(),
+                  PROT_READ | PROT_WRITE, MAP_SHARED, devmem, 0x80050000);
+        
+                mxlradcregs[0x148/4] = 0xfffffff; //Clears LRADC6:0 assignments
+                mxlradcregs[0x144/4] = 0x6543210; //set LRADC6:0 to channel 6:0
+                mxlradcregs[0x28/4] = 0xff000000; //set 1.8V Range
+                for(x = 0; x < 7; x++)
+                  mxlradcregs[(0x50+(x * 0x10))/4] = 0x0; //Clear LRADCx reg
+        
+                for(x = 0; x < 10; x++) {
+                        mxlradcregs[0x18/4] = 0x7f; //Clear interrupt ready
+                        mxlradcregs[0x4/4] = 0x7f; //Schedule conversion of chan 6:0
+                        while(!((mxlradcregs[0x10/4] & 0x7f) == 0x7f)); //wait
+                        for(i = 0; i < 7; i++)
+                          chan[i] += (mxlradcregs[(0x50+(i * 0x10))/4] & 0xffff);
+                }
+        
+                mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80002000);
+                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80040000);
+        
+                usleep(10);
+                mxhsadcregs[0x4/4] = 0x08000000; //Start conversion
+                while(!(mxhsadcregs[0x10/4] & 0x1)); //Wait for interrupt
+        
+                meas_mV = ((((chan[0]/10)*45177)*6235)/100000000);
+                printf("ADC0_val=%dmA\n", (unsigned int)(((meas_mV)*1000)/240));
+                
+        }
+        
+        if(opt_mAadc1) {
+                volatile unsigned int *mxlradcregs;
+                volatile unsigned int *mxhsadcregs;
+                volatile unisigned int *mxclkctrlregs;
+                unsigned int i, x, meas_mV;
+                unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
+                int devmem;
+        
+                devmem = open("/dev/mem", O_RDWR|O_SYNC);
+                assert(devmem != -1);
+        
+                // LRADC
+                mxlradcregs = (unsigned int *) mmap(0, getpagesize(),
+                  PROT_READ | PROT_WRITE, MAP_SHARED, devmem, 0x80050000);
+        
+                mxlradcregs[0x148/4] = 0xfffffff; //Clears LRADC6:0 assignments
+                mxlradcregs[0x144/4] = 0x6543210; //set LRADC6:0 to channel 6:0
+                mxlradcregs[0x28/4] = 0xff000000; //set 1.8V Range
+                for(x = 0; x < 7; x++)
+                  mxlradcregs[(0x50+(x * 0x10))/4] = 0x0; //Clear LRADCx reg
+        
+                for(x = 0; x < 10; x++) {
+                        mxlradcregs[0x18/4] = 0x7f; //Clear interrupt ready
+                        mxlradcregs[0x4/4] = 0x7f; //Schedule conversion of chan 6:0
+                        while(!((mxlradcregs[0x10/4] & 0x7f) == 0x7f)); //wait
+                        for(i = 0; i < 7; i++)
+                          chan[i] += (mxlradcregs[(0x50+(i * 0x10))/4] & 0xffff);
+                }
+        
+                mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80002000);
+                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80040000);
+        
+                usleep(10);
+                mxhsadcregs[0x4/4] = 0x08000000; //Start conversion
+                while(!(mxhsadcregs[0x10/4] & 0x1)); //Wait for interrupt
+        
+                meas_mV = ((((chan[1]/10)*45177)*6235)/100000000);
+                printf("ADC0_val=%dmA\n", (unsigned int)(((meas_mV)*1000)/240));
+                
+        }
+        
+        if(opt_mAadc2) {
+                volatile unsigned int *mxlradcregs;
+                volatile unsigned int *mxhsadcregs;
+                volatile unisigned int *mxclkctrlregs;
+                unsigned int i, x, meas_mV;
+                unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
+                int devmem;
+        
+                devmem = open("/dev/mem", O_RDWR|O_SYNC);
+                assert(devmem != -1);
+        
+                // LRADC
+                mxlradcregs = (unsigned int *) mmap(0, getpagesize(),
+                  PROT_READ | PROT_WRITE, MAP_SHARED, devmem, 0x80050000);
+        
+                mxlradcregs[0x148/4] = 0xfffffff; //Clears LRADC6:0 assignments
+                mxlradcregs[0x144/4] = 0x6543210; //set LRADC6:0 to channel 6:0
+                mxlradcregs[0x28/4] = 0xff000000; //set 1.8V Range
+                for(x = 0; x < 7; x++)
+                  mxlradcregs[(0x50+(x * 0x10))/4] = 0x0; //Clear LRADCx reg
+        
+                for(x = 0; x < 10; x++) {
+                        mxlradcregs[0x18/4] = 0x7f; //Clear interrupt ready
+                        mxlradcregs[0x4/4] = 0x7f; //Schedule conversion of chan 6:0
+                        while(!((mxlradcregs[0x10/4] & 0x7f) == 0x7f)); //wait
+                        for(i = 0; i < 7; i++)
+                          chan[i] += (mxlradcregs[(0x50+(i * 0x10))/4] & 0xffff);
+                }
+        
+                mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80002000);
+                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80040000);
+        
+                usleep(10);
+                mxhsadcregs[0x4/4] = 0x08000000; //Start conversion
+                while(!(mxhsadcregs[0x10/4] & 0x1)); //Wait for interrupt
+        
+                meas_mV = ((((chan[2]/10)*45177)*6235)/100000000);
+                printf("ADC0_val=%dmA\n", (unsigned int)(((meas_mV)*1000)/240));
+                
+        }
+        
+        if(opt_mAadc3) {
+                volatile unsigned int *mxlradcregs;
+                volatile unsigned int *mxhsadcregs;
+                volatile unisigned int *mxclkctrlregs;
+                unsigned int i, x, meas_mV;
+                unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
+                int devmem;
+        
+                devmem = open("/dev/mem", O_RDWR|O_SYNC);
+                assert(devmem != -1);
+        
+                // LRADC
+                mxlradcregs = (unsigned int *) mmap(0, getpagesize(),
+                  PROT_READ | PROT_WRITE, MAP_SHARED, devmem, 0x80050000);
+        
+                mxlradcregs[0x148/4] = 0xfffffff; //Clears LRADC6:0 assignments
+                mxlradcregs[0x144/4] = 0x6543210; //set LRADC6:0 to channel 6:0
+                mxlradcregs[0x28/4] = 0xff000000; //set 1.8V Range
+                for(x = 0; x < 7; x++)
+                  mxlradcregs[(0x50+(x * 0x10))/4] = 0x0; //Clear LRADCx reg
+        
+                for(x = 0; x < 10; x++) {
+                        mxlradcregs[0x18/4] = 0x7f; //Clear interrupt ready
+                        mxlradcregs[0x4/4] = 0x7f; //Schedule conversion of chan 6:0
+                        while(!((mxlradcregs[0x10/4] & 0x7f) == 0x7f)); //wait
+                        for(i = 0; i < 7; i++)
+                          chan[i] += (mxlradcregs[(0x50+(i * 0x10))/4] & 0xffff);
+                }
+        
+                mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80002000);
+                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80040000);
+        
+                usleep(10);
+                mxhsadcregs[0x4/4] = 0x08000000; //Start conversion
+                while(!(mxhsadcregs[0x10/4] & 0x1)); //Wait for interrupt
+        
+                meas_mV = ((((chan[3]/10)*45177)*6235)/100000000);
+                printf("ADC0_val=%dmA\n", (unsigned int)(((meas_mV)*1000)/240));
+                
+        }
+        
+        if(opt_mVadc0) {
+                volatile unsigned int *mxlradcregs;
+                volatile unsigned int *mxhsadcregs;
+                volatile unisigned int *mxclkctrlregs;
+                unsigned int i, x, meas_mV;
+                unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
+                int devmem;
+        
+                devmem = open("/dev/mem", O_RDWR|O_SYNC);
+                assert(devmem != -1);
+        
+                // LRADC
+                mxlradcregs = (unsigned int *) mmap(0, getpagesize(),
+                  PROT_READ | PROT_WRITE, MAP_SHARED, devmem, 0x80050000);
+        
+                mxlradcregs[0x148/4] = 0xfffffff; //Clears LRADC6:0 assignments
+                mxlradcregs[0x144/4] = 0x6543210; //set LRADC6:0 to channel 6:0
+                mxlradcregs[0x28/4] = 0xff000000; //set 1.8V Range
+                for(x = 0; x < 7; x++)
+                  mxlradcregs[(0x50+(x * 0x10))/4] = 0x0; //Clear LRADCx reg
+        
+                for(x = 0; x < 10; x++) {
+                        mxlradcregs[0x18/4] = 0x7f; //Clear interrupt ready
+                        mxlradcregs[0x4/4] = 0x7f; //Schedule conversion of chan 6:0
+                        while(!((mxlradcregs[0x10/4] & 0x7f) == 0x7f)); //wait
+                        for(i = 0; i < 7; i++)
+                          chan[i] += (mxlradcregs[(0x50+(i * 0x10))/4] & 0xffff);
+                }
+        
+                mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80002000);
+                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80040000);
+        
+                usleep(10);
+                mxhsadcregs[0x4/4] = 0x08000000; //Start conversion
+                while(!(mxhsadcregs[0x10/4] & 0x1)); //Wait for interrupt
+        
+                printf("ADC0_val=%dmV\n", (unsigned int)((((chan[0]/10)*45177)*6235)/100000000));
+                
+        }
+        
+        if(opt_mVadc1) {
+                volatile unsigned int *mxlradcregs;
+                volatile unsigned int *mxhsadcregs;
+                volatile unisigned int *mxclkctrlregs;
+                unsigned int i, x, meas_mV;
+                unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
+                int devmem;
+        
+                devmem = open("/dev/mem", O_RDWR|O_SYNC);
+                assert(devmem != -1);
+        
+                // LRADC
+                mxlradcregs = (unsigned int *) mmap(0, getpagesize(),
+                  PROT_READ | PROT_WRITE, MAP_SHARED, devmem, 0x80050000);
+        
+                mxlradcregs[0x148/4] = 0xfffffff; //Clears LRADC6:0 assignments
+                mxlradcregs[0x144/4] = 0x6543210; //set LRADC6:0 to channel 6:0
+                mxlradcregs[0x28/4] = 0xff000000; //set 1.8V Range
+                for(x = 0; x < 7; x++)
+                  mxlradcregs[(0x50+(x * 0x10))/4] = 0x0; //Clear LRADCx reg
+        
+                for(x = 0; x < 10; x++) {
+                        mxlradcregs[0x18/4] = 0x7f; //Clear interrupt ready
+                        mxlradcregs[0x4/4] = 0x7f; //Schedule conversion of chan 6:0
+                        while(!((mxlradcregs[0x10/4] & 0x7f) == 0x7f)); //wait
+                        for(i = 0; i < 7; i++)
+                          chan[i] += (mxlradcregs[(0x50+(i * 0x10))/4] & 0xffff);
+                }
+        
+                mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80002000);
+                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80040000);
+        
+                usleep(10);
+                mxhsadcregs[0x4/4] = 0x08000000; //Start conversion
+                while(!(mxhsadcregs[0x10/4] & 0x1)); //Wait for interrupt
+        
+                printf("ADC0_val=%dmV\n", (unsigned int)((((chan[1]/10)*45177)*6235)/100000000));
+                
+        }
+        
+        if(opt_mVadc2) {
+                volatile unsigned int *mxlradcregs;
+                volatile unsigned int *mxhsadcregs;
+                volatile unisigned int *mxclkctrlregs;
+                unsigned int i, x, meas_mV;
+                unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
+                int devmem;
+        
+                devmem = open("/dev/mem", O_RDWR|O_SYNC);
+                assert(devmem != -1);
+        
+                // LRADC
+                mxlradcregs = (unsigned int *) mmap(0, getpagesize(),
+                  PROT_READ | PROT_WRITE, MAP_SHARED, devmem, 0x80050000);
+        
+                mxlradcregs[0x148/4] = 0xfffffff; //Clears LRADC6:0 assignments
+                mxlradcregs[0x144/4] = 0x6543210; //set LRADC6:0 to channel 6:0
+                mxlradcregs[0x28/4] = 0xff000000; //set 1.8V Range
+                for(x = 0; x < 7; x++)
+                  mxlradcregs[(0x50+(x * 0x10))/4] = 0x0; //Clear LRADCx reg
+        
+                for(x = 0; x < 10; x++) {
+                        mxlradcregs[0x18/4] = 0x7f; //Clear interrupt ready
+                        mxlradcregs[0x4/4] = 0x7f; //Schedule conversion of chan 6:0
+                        while(!((mxlradcregs[0x10/4] & 0x7f) == 0x7f)); //wait
+                        for(i = 0; i < 7; i++)
+                          chan[i] += (mxlradcregs[(0x50+(i * 0x10))/4] & 0xffff);
+                }
+        
+                mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80002000);
+                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80040000);
+        
+                usleep(10);
+                mxhsadcregs[0x4/4] = 0x08000000; //Start conversion
+                while(!(mxhsadcregs[0x10/4] & 0x1)); //Wait for interrupt
+        
+                printf("ADC0_val=%dmV\n", (unsigned int)((((chan[2]/10)*45177)*6235)/100000000));
+                
+        }
+        
+        if(opt_mVadc3) {
+                volatile unsigned int *mxlradcregs;
+                volatile unsigned int *mxhsadcregs;
+                volatile unisigned int *mxclkctrlregs;
+                unsigned int i, x, meas_mV;
+                unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
+                int devmem;
+        
+                devmem = open("/dev/mem", O_RDWR|O_SYNC);
+                assert(devmem != -1);
+        
+                // LRADC
+                mxlradcregs = (unsigned int *) mmap(0, getpagesize(),
+                  PROT_READ | PROT_WRITE, MAP_SHARED, devmem, 0x80050000);
+        
+                mxlradcregs[0x148/4] = 0xfffffff; //Clears LRADC6:0 assignments
+                mxlradcregs[0x144/4] = 0x6543210; //set LRADC6:0 to channel 6:0
+                mxlradcregs[0x28/4] = 0xff000000; //set 1.8V Range
+                for(x = 0; x < 7; x++)
+                  mxlradcregs[(0x50+(x * 0x10))/4] = 0x0; //Clear LRADCx reg
+        
+                for(x = 0; x < 10; x++) {
+                        mxlradcregs[0x18/4] = 0x7f; //Clear interrupt ready
+                        mxlradcregs[0x4/4] = 0x7f; //Schedule conversion of chan 6:0
+                        while(!((mxlradcregs[0x10/4] & 0x7f) == 0x7f)); //wait
+                        for(i = 0; i < 7; i++)
+                          chan[i] += (mxlradcregs[(0x50+(i * 0x10))/4] & 0xffff);
+                }
+        
+                mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80002000);
+                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                  devmem, 0x80040000);
+        
+                usleep(10);
+                mxhsadcregs[0x4/4] = 0x08000000; //Start conversion
+                while(!(mxhsadcregs[0x10/4] & 0x1)); //Wait for interrupt
+        
+                printf("ADC0_val=%dmV\n", (unsigned int)((((chan[3]/10)*45177)*6235)/100000000));
+                
         }
         
         close(twifd);
