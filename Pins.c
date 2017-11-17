@@ -12,10 +12,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <math.h>
-
-#ifdef CTL
 #include <getopt.h>
-#endif
 #include "gpiolib.h"
 #include "fpga.h"
 #include "crossbar-ts7680.h"
@@ -143,17 +140,13 @@ int gpio_direction(int gpio, int dir)
         sprintf(buf, "/sys/class/gpio/gpio%d/direction", gpio);
         int gpiofd = open(buf, O_WRONLY);
         if(gpiofd < 0) {
-#ifdef CTL
                 perror("Couldn't open IRQ file");
-#ifdef CTL
                 ret = -1;
         }
         
         if(dir == 1 && gpiofd){
                 if (3 != write(gpiofd, "out", 3)) {
-#ifdef CTL
                         perror("Couldn't set GPIO direction to out");
-#endif
                         ret = -2;
                 }
         }
@@ -169,32 +162,24 @@ int gpio_setedge(int gpio, int rising, int falling)
         sprintf(buf, "/sys/class/gpio/gpio%d/edge", gpio);
         int gpiofd = open(buf, O_WRONLY);
         if(gpiofd < 0) {
-#ifdef CTL
                 perror("Couldn't open IRQ file");
-#endif
                 ret = -1;
         }
         
         if(gpiofd && rising && falling) {
                 if(4 != write(gpiofd, "both", 4)) {
-#ifdef CTL
                         perror("Failed to set IRQ to both falling & rising");
-#endif
                         ret = -2;
                 }
         } else {
                 if(rising && gpiofd) {
                         if(6 != write(gpiofd, "rising", 6)) {
-#ifdef CTL
                                 perror("Failed to set IRQ to rising");
-#endif
                                 ret = -2;
                         }
                 } else if(falling && gpiofd) {
                         if(7 != write(gpiofd, "falling", 7)) {
-#ifdef CTL
                                 perror("Failed to set IRQ to falling");
-#endif
                                 ret = -3;
                         }
                 }
@@ -214,9 +199,7 @@ int gpio_selection(int gpio)
         snprintf(gpio_irq, sizeof(gpio_irq), "/sys/class/gpio/gpio%d/value", gpio);
         irqfd = open(gpio_irq, )RDONLY, S_IREAD);
         if(irqfd < 1) {
-#ifdef CTL
                 perror("Couldn't open the value file");
-#endif
                 return -1;
         }
         
@@ -247,9 +230,7 @@ int gpio_export(int gpio)
                 sprintf(buf, "%d", gpio);
                 ret = write(efd, buf, strlen(buf));
                 if(ret < 0) {
-#ifdef CTL
                         perror("Export failed");
-#endif
                                return -2;
                 }
                 close(efd);
@@ -279,19 +260,15 @@ int gpio_read(int gpio)
         sprintf(buf, "/sys/class/gpio/gpio%d/value", gpio);
         gpiofd = open(buf, O_RDWR);
         if(gpiofd < 0) {
-#ifdef CTL
                 fprintf(stderr, "Failed to open gpio %d value\n", gpio);
                 perror("gpio failed");
-#endif
         }
         
         do {
                 nread = read(gpiofd, in, 1);
         } while (nread == 0);
         if(nread == -1){
-#ifdef CTL
                 perror("GPIO Read Failed");
-#endif
                 return -1;
         }
         
@@ -309,9 +286,7 @@ int gpio_write(int gpio, int val)
                 snprintf(buf, 2, "%d", val);
                 ret = write(gpiofd, buf, 2);
                 if(ret < 0) {
-#ifdef CTL
                         perror("failed to set gpio");
-#endif
                         return 1;
                 }
                 
@@ -359,31 +334,31 @@ int main(int argc, char **argv)
                 
                 switch(c) {
                         case 'p':
-                                gpio = atio(optarg);
+                                gpio = atoi(optarg);
                                 gpio_export(gpio);
                                 printf("gpio%d=%d\n", gpio, gpio_read(gpio));
                                 gpio_unexport(gpio);
                                 break;
                         case 'e':
-                                gpio = atio(optarg);
+                                gpio = atoi(optarg);
                                 gpio_export(gpio);
                                 gpio_write(gpio, 1);
                                 gpio_unexport(gpio);
                                 break;
                         case 'l':
-                                gpio = atio(optarg);
+                                gpio = atoi(optarg);
                                 gpio_export(gpio);
                                 gpio_write(gpio, 0);
                                 gpio_unexport(gpio);
                                 break;
                         case 'd':
-                                gpio = atio(optarg);
+                                gpio = atoi(optarg);
                                 gpio_export(gpio);
                                 gpio_direction(gpio, 1);
                                 gpio_unexport(gpio);
                                 break;
                         case 'r':
-                                gpio = atio(optarg);
+                                gpio = atoi(optarg);
                                 gpio_export(gpio);
                                 gpio_direction(gpio, 0);
                                 gpio_unexport(gpio);
@@ -394,7 +369,6 @@ int main(int argc, char **argv)
                 }
         }
 }
-#endif
 
 
 /********************************************************************************/
@@ -881,33 +855,77 @@ int main(int argc, char **argv)
 }
 
 
+/********************************************************************************/
+// Usage & Main Function 
+/********************************************************************************/
+
+
+void usage(char **argv) {
+        fprintf(stderr,
+                "Usage: %s [OPTIONS ...\n"
+                "\n"
+                "  -h, --help                   Displays this message\n"
+                "\n"
+                "***********************Board Info and Setup***********************\n"
+                "\n"
+                "  -i, --info                   Display board information\n"
+                "  -t, --cputemp                Print CPU internal Temp\n"
+                "  -m, --getmac                 Display ethernet MAC address\n"
+                "  -o, --ddrout <dio>           Set sysfs DIO to an output\n"
+                "  -e, --ddrin <dio>            Set sysfs DIO to an input\n"
+                "\n"
+                "*******************Set Digital and Analog Outputs*****************\n"
+                "\n"
+                "  -j, --sethigh <dio>          Set a sysfs Digout value high\n"
+                "  -l, --setlow <dio>           Set a sysds DigIn value low\n"
+                "  -a, --dac0 <Vout>            Set DAC0 output value to Vout\n"
+                "  -b, --dac1 <Vout>            Set DAC1 output value to Vout\n"
+                "  -c, --dac2 <Vout>            Set DAC2 output value to Vout\n"
+                "  -d, --dac3 <Vout>            Set DAC3 output value to Vout\n"
+                "\n"
+                "*******************Set Digital and Analog Inputs******************\n"
+                "\n"
+                "  -g, --getin <dio>            Return the input value of DIO <n>\n"
+                "  -w, --getadc0                Return the input value of ADC0\n"
+                "  -x, --getadc1                Return the input value of ADC1\n"
+                "  -y, --getadc2                Return the input value of ADC2\n"
+                "  -z, --getadc3                Return the input value of ADC3\n"
+                "\n"
+                argv[0]
+        );
+}
 
 
 
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
