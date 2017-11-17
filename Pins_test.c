@@ -292,21 +292,10 @@ int main(int argc, char **argv)
                 { "getadcV3", 0, 0, 'z' },
                 { 0, 0, 0, 0 }
         };
-        
-        model = get_model();
-        if(model == 0x7680) {
-                cbar_inputs = ts7680_inputs;
-                cbar_outputs = ts7680_outputs;
-                cbar_size = 6;
-                cbar_mask = 3;
-        } else {
-                fprintf(stderr, "Unsupported model TS-%x\n", model);
-                return 1;
-        }
-        
-        while((c = getopt_long(argc, argv, "+m:v:o:x:ta:cgsqhipl:e1Zb:d:f:j",
+                
+        while((c = getopt_long(argc, argv, "h:i:t:m:o:e:j:l:a:b:c:d:g:p:q:r:s:w:x:y:z:",
           long_option, NULL)) != -1) {
-                int gpio, i;
+                int gpio;
                 
                 switch(c) {
                                 
@@ -396,7 +385,7 @@ int main(int argc, char **argv)
                 }
         }
         
-        twifd = fpga_init(NULL< 0);
+        twifd = fpga_init(NULL, 0);
         if(twifd == -1) {
                 perror("Can't open FPGA I2C bus");
                 return 1;
