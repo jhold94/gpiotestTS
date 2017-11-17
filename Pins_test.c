@@ -89,7 +89,7 @@ int gpio_select(int gpio)
         FD_ZERO(&fds);
         
         snprintf(gpio_irq, sizeof(gpio_irq), "/sys/class/gpio/gpio%d/value", gpio);
-        irqfd = open(gpio_irq, RDONLY, S_IREAD);
+        irqfd = open(gpio_irq, O_RDONLY, S_IREAD);
         if(irqfd < 1) {
                 perror("Couldn't open the value file");
                 return -1;
