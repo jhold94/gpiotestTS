@@ -566,8 +566,8 @@ int main(int argc, char **argv)
         if(opt_mAadc0) {
                 volatile unsigned int *mxlradcregs;
                 volatile unsigned int *mxhsadcregs;
-                volatile unsigned int *mxclkctrlregs;
-                unsigned int i, x, meas_mV;
+                volatile unisigned int *mxclkctrlregs;
+                unsigned int i, x;
                 unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
                 int devmem;
         
@@ -594,12 +594,47 @@ int main(int argc, char **argv)
         
                 mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80002000);
-                mxclkctrlregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80040000);
         
+                //HSADC
+                //See if the HSADC needs to be brought out of reset
+                if(mxhsadcregs[0x0/4] & 0xc0000000) {
+                        mxclkctrlregs[0x154/4] = 0x70000000;
+                        mxclkctrlregs[0x1c8/4] = 0x8000;
+                        //ENGR116296 errata workaround
+                        mxhsadcregs[0x8/4] = 0x80000000;
+                        mxhsadcregs[0x0/4] = ((mxhsadcregs[0x0/4] | 0x80000000) & (~0x40000000));
+                        mxhsadcregs[0x4/4] = 0x40000000;
+                        mxhsadcregs[0x8/4] = 0x40000000;
+                        mxhsadcregs[0x4/4] = 0x40000000;
+                
+                        usleep(10);
+                        mxhsadcregs[0x8/4] = 0xc0000000;
+                }
+        
+                mxhsadcregs[0x28/4] = 0x2000; //Clear powerdown
+                mxhsadcregs[0x24/4] = 0x31; //Set precharge and SH bypass
+                mxhsadcregs[0x30/4] = 0xa; //Set sample num
+                mxhsadcregs[0x40/4] = 0x1; //Set seq num
+                mxhsadcregs[0x4/4] = 0x40000; //12bit mode
+        
+                while(!(mxhsadcregs[0x10/4] & 0x20)) {
+                        mxhsadcregs[0x50/4]; //Empty FIFO
+                }
+        
+                mxhsadcregs[0x50/4]; //An extra read is necessary
+        
+                mxhsadcregs[0x14/4] = 0xfc000000; //Clear interrupts
+                mxhsadcregs[0x4/4] = 0x1; //Set HS_RUN
                 usleep(10);
                 mxhsadcregs[0x4/4] = 0x08000000; //Start conversion
                 while(!(mxhsadcregs[0x10/4] & 0x1)); //Wait for interrupt
+        
+                for(i = 0; i < 5; i++) {
+                        x = mxhsadcregs[0x50/4];
+                        chan[7] += ((x & 0xfff) + ((x >> 16) & 0xfff));
+                }
         
                 meas_mV = ((((chan[0]/10)*45177)*6235)/100000000);
                 printf("ADC0_val=%dmA\n", (unsigned int)(((meas_mV)*1000)/240));
