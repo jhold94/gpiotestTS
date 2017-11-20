@@ -142,32 +142,32 @@ int gpio_setedge(int gpio, int rising, int falling)
 
 int gpio_select(int gpio)
 {
-        char gpio_irq[64];
-        int ret = 0, buf, irqfd;
-        fd_set fds;
-        FD_ZERO(&fds);
-        
-        snprintf(gpio_irq, sizeof(gpio_irq), "/sys/class/gpio/gpio%d/value", gpio);
-        irqfd = open(gpio_irq, O_RDONLY, S_IREAD);
-        if(irqfd < 1) {
-                perror("Couldn't open the value file");
-                return -1;
-        }
-        
-        // Read first since there is always an initial status
-        read(irqfd, &buf, sizeof(buf));
-        
-        while(1) {
-                FD_SET(irqfd, &fds);
-                ret = select(irqfd + 1, NULL, NULL, &fds, NULL);
-                if(FD_ISSET(irqfd, &fds));
-                {
-                        FD_CLR(irqfd, &fds); //Remove the filedes from set
-                        // Clear the junk data in the IRQ file
-                        read(irqfd, &buf, sizeof(buf));
-                        return 1;
-                }
-        }
+	char gpio_irq[64];
+	int ret = 0, buf, irqfd;
+	fd_set fds;
+	FD_ZERO(&fds);
+
+	snprintf(gpio_irq, sizeof(gpio_irq), "/sys/class/gpio/gpio%d/value", gpio);
+	irqfd = open(gpio_irq, O_RDONLY, S_IREAD);
+	if(irqfd < 1) {
+		perror("Couldn't open the value file");
+		return -1;
+	}
+
+	// Read first since there is always an initial status
+	read(irqfd, &buf, sizeof(buf));
+
+	while(1) {
+		FD_SET(irqfd, &fds);
+		ret = select(irqfd + 1, NULL, NULL, &fds, NULL);
+		if(FD_ISSET(irqfd, &fds))
+		{
+			FD_CLR(irqfd, &fds);  //Remove the filedes from set
+			// Clear the junk data in the IRQ file
+			read(irqfd, &buf, sizeof(buf));
+			return 1;
+		}
+	}
 }
 
 int gpio_export(int gpio)
