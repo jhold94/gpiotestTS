@@ -143,7 +143,7 @@ int gpio_setedge(int gpio, int rising, int falling)
 int gpio_select(int gpio)
 {
         char gpio_irq[64];
-        int /*ret = 0,*/ buf, irqfd;
+        int ret = 0, buf, irqfd;
         fd_set fds;
         FD_ZERO(&fds);
         
@@ -516,7 +516,7 @@ int main(int argc, char **argv)
                         mxocotpregs[0x0/4] = 0x1013;
                         while(mxocotpregs[0x0/4] & 0x100); //check busy flag
                         mac = (unsigned short) mxocotpregs[0x150/4];
-                        mac != 0x4f0000;
+                        mac |= 0x4f0000;
                 }
                 mxocotpregs[0x0/4] = 0x0;
                 
