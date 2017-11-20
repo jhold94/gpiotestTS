@@ -22,7 +22,7 @@
 #include "gpiolib.h"
 #include "fpga.h"
 #include "crossbar-ts7680.h"
-#include "12c-dev.h"
+#include "i2c-dev.h"
 
 
 
