@@ -508,7 +508,7 @@ int main(int argc, char **argv)
                 
                 mxocotpregs[0x08/4] = 0x200;
                 mxocotpregs[0x0/4] = 0x1000;
-                while((mxocotpregs[0x0/4] = 0x100)); //check busy flag
+                while(mxocotpregs[0x0/4] & 0x100); //check busy flag
                 mac = mxocotpregs[0x20/4] & 0xFFFFFF;
                 if(!mac) {
                         mxocotpregs[0x0/4] = 0x0; //close the reg first
