@@ -352,7 +352,7 @@ int main(int argc, char **argv)
                 { 0, 0, 0, 0 }
         };
                 
-        while((c = getopt_long(argc, argv, "+h:i:t:m:o:e:j:l:a:b:c:d:g:p:q:r:s:w:x:y:z:", 
+        while((c = getopt_long(argc, argv, "+o:hitme:j:l:a:b:c:d:pqrswxyzgs:", 
           long_options, NULL)) != -1) {
                 int gpio;
                 
