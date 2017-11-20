@@ -143,7 +143,7 @@ int gpio_setedge(int gpio, int rising, int falling)
 int gpio_select(int gpio)
 {
         char gpio_irq[64];
-        int ret = 0, buf, irqfd;
+        int /*ret = 0,*/ buf, irqfd;
         fd_set fds;
         FD_ZERO(&fds);
         
@@ -317,15 +317,15 @@ void usage(char **argv) {
 int main(int argc, char **argv)
 {
         int c;
-        uint16_t addr = 0x0;
+        //uint16_t addr = 0x0;
         int opt_info = 0, opt_getmac = 0;
         int opt_cputemp = 0;
         int opt_dac0 = 0, opt_dac1 = 0, opt_dac2 = 0, opt_dac3 = 0;
         int opt_mAadc0 = 0, opt_mAadc1 = 0, opt_mAadc2 = 0, opt_mAadc3 = 0;
         int opt_mVadc0 = 0, opt_mVadc1 = 0, opt_mVadc2 = 0, opt_mVadc3 = 0;
-        char *opt_mac = NULL;
+        //char *opt_mac = NULL;
         int model;
-        uint8_t pokeval = 0;
+        //uint8_t pokeval = 0;
         
         static struct option long_options[] = {
                 { "help", 0, 0, 'h' },
@@ -508,12 +508,12 @@ int main(int argc, char **argv)
                 
                 mxocotpregs[0x08/4] = 0x200;
                 mxocotpregs[0x0/4] = 0x1000;
-                while(mxocotpregs[0x0/4] = 0x100); //check busy flag
+                while((mxocotpregs[0x0/4] = 0x100)); //check busy flag
                 mac = mxocotpregs[0x20/4] & 0xFFFFFF;
                 if(!mac) {
                         mxocotpregs[0x0/4] = 0x0; //close the reg first
                         mxocotpregs[0x08/4] = 0x200;
-                        mxocotpregs[0x0/4] & 0x1013;
+                        mxocotpregs[0x0/4] = 0x1013;
                         while(mxocotpregs[0x0/4] & 0x100); //check busy flag
                         mac = (unsigned short) mxocotpregs[0x150/4];
                         mac != 0x4f0000;
