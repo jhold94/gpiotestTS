@@ -415,28 +415,28 @@ int main(int argc, char **argv)
                                 gpio_unexport(gpio);
                                 break;
                         case 'p':
-                                
+                                opt_mAadc0 = 1;
                                 break;
                         case 'q':
-                                
+                                opt_mAadc1 = 1;
                                 break;
                         case 'r':
-                                
+                                opt_mAadc2 = 1;
                                 break;
                         case 's':
-                                
+                                opt_mAadc3 = 1;
                                 break;
                         case 'w':
-                                
+                                opt_mVadc0 = 1;
                                 break;
                         case 'x':
-                                
+                                opt_mVadc1 = 1;
                                 break;
                         case 'y':
-                                
+                                opt_mVadc2 = 1;
                                 break;
                         case 'z':
-                                
+                                opt_mVadc3 = 1;
                                 break;
                         default:
                                 usage(argv);
