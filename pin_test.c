@@ -948,7 +948,7 @@ int main(int argc, char **argv)
                         chan[7] += ((x & 0xfff) + ((x >> 16) & 0xfff));
                 }
         
-                printf("ADC0_val=%dmV\n", (unsigned int)((((chan[2]/10)*45177)*6235)/100000000));
+                printf("ADC0_val=%dmV\n", (unsigned int)((((chan[0]/10)*45177)*6235)/100000000));
         }
         
         if(opt_mVadc1) {
@@ -1024,7 +1024,7 @@ int main(int argc, char **argv)
                         chan[7] += ((x & 0xfff) + ((x >> 16) & 0xfff));
                 }
         
-                printf("ADC1_val=%dmV\n", (unsigned int)((((chan[2]/10)*45177)*6235)/100000000));
+                printf("ADC1_val=%dmV\n", (unsigned int)((((chan[1]/10)*45177)*6235)/100000000));
         }
         
         if(opt_mVadc2) {
@@ -1176,7 +1176,7 @@ int main(int argc, char **argv)
                         chan[7] += ((x & 0xfff) + ((x >> 16) & 0xfff));
                 }
         
-                printf("ADC3_val=%dmV\n", (unsigned int)((((chan[2]/10)*45177)*6235)/100000000));
+                printf("ADC3_val=%dmV\n", (unsigned int)((((chan[3]/10)*45177)*6235)/100000000));
         }
         
         close(twifd);
