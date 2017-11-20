@@ -277,7 +277,7 @@ int get_model()
 
 void usage(char **argv) {
         fprintf(stderr,
-                "Usage: %s [OPTIONS ...\n"
+                "Usage: %s [OPTIONS] ...\n"
                 "\n"
                 "  -h, --help                   Displays this message\n"
                 "\n"
