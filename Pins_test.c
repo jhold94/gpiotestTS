@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 {
         volatile unsigned int *mxlradcregs;
         volatile unsigned int *mxhsadcregs;
-        volatile unisigned int *mxclkctrlregs;
+        volatile unsigned int *mxclkctrlregs;
         unsigned int i, x;
         unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
         int devmem;
