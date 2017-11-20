@@ -333,7 +333,7 @@ int main(int argc, char **argv)
                 { "cputemp", 0, 0, 't' },
                 { "getmac", 0, 0, 'm' },
                 { "ddrout", 1, 0, 'o' },
-                { "ddrin", 1, 0, 't' },
+                { "ddrin", 1, 0, 'e' },
                 { "sethigh", 1, 0, 'j' },
                 { "setlow", 1, 0, 'l' },
                 { "dac0", 1, 0, 'a' },
