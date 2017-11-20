@@ -257,14 +257,14 @@ void usage(char **argv) {
 
 int main(int argc, char **argv)
 {
-        int c, i;
-        uint16_t addr = 0x0;
+        int c;
+        //uint16_t addr = 0x0;
         int opt_info = 0, opt_getmac = 0;
         int opt_cputemp = 0;
         int opt_dac0 = 0, opt_dac1 = 0, opt_dac2 = 0, opt_dac3 = 0;
         int opt_mAadc0 = 0, opt_mAadc1 = 0, opt_mAadc2 = 0, opt_mAadc3 = 0;
         int opt_mVadc0 = 0, opt_mVadc1 = 0, opt_mVadc2 = 0, opt_mVadc3 = 0;
-        char *opt_mac = NULL;
+        //char *opt_mac = NULL;
         int model;
         uint8_t pokeval = 0;
         
@@ -293,7 +293,8 @@ int main(int argc, char **argv)
                 { 0, 0, 0, 0 }
         };
                 
-        while((c = getopt_long(argc, argv, "+h:tmi:o:e:j:l:a:b:c:d:pqrswxyzg:", long_option, NULL)) != -1) {
+        while((c = getopt_long(argc, argv, "+h:tmi:o:e:j:l:a:b:c:d:pqrswxyzg:", 
+          long_options, NULL)) != -1) {
                 int gpio;
                 
                 switch(c) {
@@ -421,7 +422,7 @@ int main(int argc, char **argv)
                          * Pull out samples */
                         mxlradcregs[0x18/4] = 0x3;
                         mxlradcregs[0x4/4] = 0x3;
-                        while(!(mxlradcregs[0x10/4] & 0x3) == 0x3));
+                        while(!((mxlradcregs[0x10/4] & 0x3) == 0x3));
                         temp[0] += mxlradcregs[0x60/4] & 0xFFFF;
                         temp[1] += mxlradcregs[0x50/4] & 0xFFFF;
                 }
@@ -504,7 +505,7 @@ int main(int argc, char **argv)
         if(opt_mAadc0) {
                 volatile unsigned int *mxlradcregs;
                 volatile unsigned int *mxhsadcregs;
-                volatile unisigned int *mxclkctrlregs;
+                volatile unsigned int *mxclkctrlregs;
                 unsigned int i, x, meas_mV;
                 unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
                 int devmem;
@@ -532,7 +533,7 @@ int main(int argc, char **argv)
         
                 mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80002000);
-                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                mxclkctrlregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80040000);
         
                 usleep(10);
@@ -547,7 +548,7 @@ int main(int argc, char **argv)
         if(opt_mAadc1) {
                 volatile unsigned int *mxlradcregs;
                 volatile unsigned int *mxhsadcregs;
-                volatile unisigned int *mxclkctrlregs;
+                volatile unsigned int *mxclkctrlregs;
                 unsigned int i, x, meas_mV;
                 unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
                 int devmem;
@@ -575,7 +576,7 @@ int main(int argc, char **argv)
         
                 mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80002000);
-                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                mxclkctrlregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80040000);
         
                 usleep(10);
@@ -590,7 +591,7 @@ int main(int argc, char **argv)
         if(opt_mAadc2) {
                 volatile unsigned int *mxlradcregs;
                 volatile unsigned int *mxhsadcregs;
-                volatile unisigned int *mxclkctrlregs;
+                volatile unsigned int *mxclkctrlregs;
                 unsigned int i, x, meas_mV;
                 unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
                 int devmem;
@@ -618,7 +619,7 @@ int main(int argc, char **argv)
         
                 mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80002000);
-                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                mxclkctrlregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80040000);
         
                 usleep(10);
@@ -633,7 +634,7 @@ int main(int argc, char **argv)
         if(opt_mAadc3) {
                 volatile unsigned int *mxlradcregs;
                 volatile unsigned int *mxhsadcregs;
-                volatile unisigned int *mxclkctrlregs;
+                volatile unsigned int *mxclkctrlregs;
                 unsigned int i, x, meas_mV;
                 unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
                 int devmem;
@@ -661,7 +662,7 @@ int main(int argc, char **argv)
         
                 mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80002000);
-                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                mxclkctrlregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80040000);
         
                 usleep(10);
@@ -676,7 +677,7 @@ int main(int argc, char **argv)
         if(opt_mVadc0) {
                 volatile unsigned int *mxlradcregs;
                 volatile unsigned int *mxhsadcregs;
-                volatile unisigned int *mxclkctrlregs;
+                volatile unsigned int *mxclkctrlregs;
                 unsigned int i, x, meas_mV;
                 unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
                 int devmem;
@@ -704,7 +705,7 @@ int main(int argc, char **argv)
         
                 mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80002000);
-                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                mxclkctrlregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80040000);
         
                 usleep(10);
@@ -718,7 +719,7 @@ int main(int argc, char **argv)
         if(opt_mVadc1) {
                 volatile unsigned int *mxlradcregs;
                 volatile unsigned int *mxhsadcregs;
-                volatile unisigned int *mxclkctrlregs;
+                volatile unsigned int *mxclkctrlregs;
                 unsigned int i, x, meas_mV;
                 unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
                 int devmem;
@@ -746,7 +747,7 @@ int main(int argc, char **argv)
         
                 mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80002000);
-                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                mxclkctrlregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80040000);
         
                 usleep(10);
@@ -760,7 +761,7 @@ int main(int argc, char **argv)
         if(opt_mVadc2) {
                 volatile unsigned int *mxlradcregs;
                 volatile unsigned int *mxhsadcregs;
-                volatile unisigned int *mxclkctrlregs;
+                volatile unsigned int *mxclkctrlregs;
                 unsigned int i, x, meas_mV;
                 unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
                 int devmem;
@@ -788,7 +789,7 @@ int main(int argc, char **argv)
         
                 mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80002000);
-                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                mxclkctrlregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80040000);
         
                 usleep(10);
@@ -802,7 +803,7 @@ int main(int argc, char **argv)
         if(opt_mVadc3) {
                 volatile unsigned int *mxlradcregs;
                 volatile unsigned int *mxhsadcregs;
-                volatile unisigned int *mxclkctrlregs;
+                volatile unsigned int *mxclkctrlregs;
                 unsigned int i, x, meas_mV;
                 unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
                 int devmem;
@@ -830,7 +831,7 @@ int main(int argc, char **argv)
         
                 mxhsadcregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80002000);
-                mxclkctrlregs = mmap(0, getpagezie(), PROT_READ|PROT_WRITE, MAP_SHARED,
+                mxclkctrlregs = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
                   devmem, 0x80040000);
         
                 usleep(10);
