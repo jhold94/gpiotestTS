@@ -317,13 +317,13 @@ void usage(char **argv) {
 int main(int argc, char **argv)
 {
         int c;
-        //uint16_t addr = 0x0;
+        uint16_t addr = 0x0;
         int opt_info = 0, opt_getmac = 0;
         int opt_cputemp = 0;
         int opt_dac0 = 0, opt_dac1 = 0, opt_dac2 = 0, opt_dac3 = 0;
         int opt_mAadc0 = 0, opt_mAadc1 = 0, opt_mAadc2 = 0, opt_mAadc3 = 0;
         int opt_mVadc0 = 0, opt_mVadc1 = 0, opt_mVadc2 = 0, opt_mVadc3 = 0;
-        //char *opt_mac = NULL;
+        char *opt_mac = NULL;
         int model;
         uint8_t pokeval = 0;
         
