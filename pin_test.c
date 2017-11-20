@@ -182,7 +182,7 @@ int gpio_export(int gpio)
                 ret = write(efd, buf, strlen(buf));
                 if(ret < 0) {
                         perror("Export failed");
-                               return -2;
+                        return -2;
                 }
                 close(efd);
         } else {
@@ -455,6 +455,7 @@ int main(int argc, char **argv)
                 gpio_export(44);
                 printf("bootmode=0x%X\n", gpio_read(44) ? 1:0);
                 printf("fpga_revision=0x%X\n", fpeek8(twifd, 0x7F));
+                gpio_unexport(44);
         }
         
         if(opt_cputemp) {
