@@ -451,6 +451,7 @@ int main(int argc, char **argv)
         }
         
         if(opt_info) {
+                model = get_model();
                 printf("model=0x%X\n", model);
                 gpio_export(44);
                 printf("bootmode=0x%X\n", gpio_read(44) ? 1:0);
