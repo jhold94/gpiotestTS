@@ -41,7 +41,7 @@ fi
 
 if [ x$1 = "xuninstall" ]; then
   cd ts7680ctl
-  echo -n "ts7680ctl: " ; $sudo make uninstall
+  echo -n "ts7680ctl: " ; $make uninstall
   exit
 fi
 
@@ -77,15 +77,15 @@ fi
   echo
   echo "ts7680ctl Library"
   cd ts7680ctl
-  $sudo make uninstall
+  $make uninstall
   if [ x$1 = "xstatic" ]; then
     make -j5 static
     check_make_ok
-    $sudo make install-static
+    $make install-static
   else
     make -j5
     check_make_ok
-    $sudo make install
+    $make install
   fi
   check_make_ok
 
