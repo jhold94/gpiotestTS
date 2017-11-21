@@ -1,0 +1,4 @@
+debian/tmp/usr/bin
+debian/tmp/usr/man	usr/share
+README.TXT		usr/share/doc/ts7680ctl
+People			usr/share/doc/ts7680ctl
