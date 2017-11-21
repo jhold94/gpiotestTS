@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+/bin/chown root.root	/usr/bin/ts7680ctl
+/bin/chmod 4755		/usr/bin/ts7680ctl
+/sbin/ldconfig
