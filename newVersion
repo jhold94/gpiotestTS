@@ -1,0 +1,47 @@
+#!/bin/sh -e
+#
+# newVersion:
+#	Utility to create the version.h include file for the ts7680ctl command.
+#	and the Debian package
+#
+#	Copyright (c) 2017 Joshua Holder - Custom Controls Unlimited Inc.
+#################################################################################
+# This file is part of ts7680ctl:
+#	A pin control library for the TS-7680
+#
+#    ts7680ctl is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    ts7680ctl is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Lesser General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public License
+#    along with ts7680ctl.  If not, see <http://www.gnu.org/licenses/>.
+#################################################################################
+
+echo Updating to version: `cat VERSION`
+
+rm -f version.h
+vMaj=`cut -d. -f1 VERSION`
+vMin=`cut -d. -f2 VERSION`
+echo "#define VERSION \"`cat VERSION`\"" > version.h
+echo "#define VERSION_MAJOR $vMaj"		>> version.h
+echo "#define VERSION_MINOR $vMin"		>> version.h
+
+rm -f debian-template/ts7680ctl/DEBIAN/control
+cat > debian-template/ts7680ctl/DEBIAN/control <<EOF
+Package: ts7680ctl
+Version: `cat VERSION`
+Section: libraries
+Priority: optional
+Architecture: armhf
+Depends: libc6
+Maintainer: Joshua Holder
+Description: The ts7680ctl libraries, headers and ts7680ctl command
+  Libraries to allow GPIO/ADC/DAC access on a TS-7680 from C and C++
+  and BASIC programs as well as from the command-line
+EOF
