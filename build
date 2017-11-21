@@ -40,7 +40,7 @@ if [ x$1 = "xclean" ]; then
 fi
 
 if [ x$1 = "xuninstall" ]; then
-  cd wiringts
+  cd ts7680ctl
   echo -n "ts7680ctl: " ; $sudo make uninstall
   exit
 fi
@@ -49,17 +49,17 @@ fi
 
 if [ x$1 = "xdebian" ]; then
   here=`pwd`
-  cd debian-template/wiringts
+  cd debian-template/ts7680ctl
   rm -rf usr
-  cd $here/wiringts
+  cd $here/ts7680ctl
   make install-deb
   cd $here/devLib
-  make install-deb INCLUDE='-I. -I../wiringts'
-  cd $here/gpio
-  make install-deb INCLUDE='-I../wiringts -I../devLib' LDFLAGS=-L../debian-template/wiringts/usr/lib
+  make install-deb INCLUDE='-I. -I../ts7680ctl'
+  cd $here/ts7680ctl
+  make install-deb INCLUDE='-I../ts7680ctl -I../devLib' LDFLAGS=-L../debian-template/ts7680ctl/usr/lib
   cd $here/debian-template
-  fakeroot dpkg-deb --build wiringts
-  mv wiringts.deb  wiringts-`cat $here/VERSION`-1.deb
+  fakeroot dpkg-deb --build ts7680ctl
+  mv ts7680ctl.deb  ts7680ctl-`cat $here/VERSION`-1.deb
   exit
 fi
 
@@ -68,15 +68,15 @@ if [ x$1 != "x" ]; then
   exit 1
 fi
 
-  echo "wiringts Build script"
+  echo "ts7680ctl Build script"
   echo "====================="
   echo
 
   hardware=`fgrep Hardware /proc/cpuinfo | head -1 | awk '{ print $3 }'`
 
   echo
-  echo "Wiringts Library"
-  cd wiringts
+  echo "ts7680ctl Library"
+  cd ts7680ctl
   $sudo make uninstall
   if [ x$1 = "xstatic" ]; then
     make -j5 static
@@ -90,7 +90,7 @@ fi
   check_make_ok
 
   echo
-  echo "Wiringts Devices Library"
+  echo "ts7680ctl Devices Library"
   cd ../devLib
   $sudo make uninstall
   if [ x$1 = "xstatic" ]; then
@@ -105,8 +105,8 @@ fi
   check_make_ok
 
   echo
-  echo "GPIO Utility"
-  cd ../gpio
+  echo "ts7680ctl Utility"
+  cd ../ts7680ctl
   make -j5
   check_make_ok
   $sudo make install
@@ -129,10 +129,8 @@ fi
 echo
 echo All Done.
 echo ""
-echo "NOTE: To compile programs with wiringts, you need to add:"
-echo "    -lwiringts"
+echo "NOTE: To compile programs with ts7680ctl, you need to add:"
+echo "    -lts7680ctl"
 echo "  to your compile line(s) To use the Gertboard, MaxDetect, etc."
-echo "  code (the devLib), you need to also add:"
-echo "    -lwiringtsDev"
 echo "  to your compile line(s)."
 echo ""
