@@ -1,5 +1,5 @@
 /********************************************************************************/
-// USE: gcc -fno-tree-cselim -Wall -O0 -mcpu=arm9 -o pin_test pin_test.c
+// USE: gcc -fno-tree-cselim -Wall -O0 -mcpu=arm9 -o ts7680ctl ts7680ctl.c
 /********************************************************************************/
 
 #include <assert.h>
