@@ -1,0 +1,10 @@
+Package: ts7680ctl
+Version: 1.00
+Section: libraries
+Priority: optional
+Architecture: armhf
+Depends: libc6
+Maintainer: Gordon Henderson <projects@drogon.net>
+Description: The ts7680ctl libraries, headers and ts7680ctl command
+  Libraries to allow GPIO/ADC/DAC access on a TS-7680 from C and C++
+  and BASIC programs as well as from the command-line
