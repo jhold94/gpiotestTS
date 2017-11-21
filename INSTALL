@@ -1,0 +1,34 @@
+    
+How to install ts7680ctl
+=======================
+
+The easiest way is to use the supplied 'build' script:
+
+  ./build
+
+that should do a complete install or upgrade of ts7680ctl for you.
+
+That will install a dynamic library.
+
+Some distributions do not have /usr/local/lib in the default LD_LIBRARY_PATH. To
+fix this, you need to edit /etc/ld.so.conf and add in a single line:
+
+  /usr/local/lib
+
+then run the ldconfig command.
+
+  sudo ldconfig
+
+If you want to install a static library, you may need to do this manually:
+
+  cd ts7680ctl
+  make static
+  sudo make install-static
+
+
+To un-install ts7680ctl:
+
+  ./build uninstall
+
+Joshua Holder
+Custom Controls Unlimited Inc.
