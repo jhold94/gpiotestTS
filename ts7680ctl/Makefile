@@ -35,7 +35,9 @@ INCLUDE	= -I$(DESTDIR)$(PREFIX)/include
 CFLAGS	= $(DEBUG) -Wall -Wextra $(INCLUDE) -Winline -pipe
 
 LDFLAGS	= -L$(DESTDIR)$(PREFIX)/lib
-LIBS    = -lts7680ctl -lts7680ctlDev -lpthread -lrt -lm -lcrypt
+LIBS    = -lpthread -lrt -lm -lcrypt
+
+# -lts7680ctl -lts7680ctlDev 
 
 # May not need to  alter anything below this line
 ###############################################################################
