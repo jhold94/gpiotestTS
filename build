@@ -77,7 +77,7 @@ fi
   echo
   echo "ts7680ctl Library"
   cd ts7680ctl
-  $sudo make uninstall
+ # $sudo make uninstall
   if [ x$1 = "xstatic" ]; then
     make -j5 static
     check_make_ok
