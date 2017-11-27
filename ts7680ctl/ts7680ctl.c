@@ -270,7 +270,7 @@ int get_model()
         return strtoull(ptr+3, NULL, 16);
 }
 
-void dac(int dacpin, int value)
+int dac(int dacpin, int value)
 {
 	value = value * 360;
 	switch(dacpin) {
