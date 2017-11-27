@@ -84,7 +84,7 @@ uint8_t fpeek8(int twifd, uint16_t addr)
 /********************************************************************************/
 // Digital IO and two Relays Setup
 /********************************************************************************/
-int gpio_direction(int gpio, int dir)
+int pinMode(int gpio, int dir)
 {
         int ret = 0;
         char buf[50];
@@ -203,7 +203,7 @@ void gpio_unexport(int gpio)
         close(gpiofd);
 }
 
-int gpio_read(int gpio)
+int digitalRead(int gpio)
 {
         char in[3] = {0, 0, 0};
         char buf[50];
@@ -227,7 +227,7 @@ int gpio_read(int gpio)
         return atoi(in);
 }
 
-int gpio_write(int gpio, int val)
+int digitalWrite(int gpio, int val)
 {
         char buf[50];
         int ret, gpiofd;
@@ -371,13 +371,13 @@ int main(int argc, char **argv)
                         case 'o':
                                 gpio = atoi(optarg);
                                 gpio_export(gpio);
-                                gpio_direction(gpio, 1);
+                                pinMode(gpio, 1);
                                 gpio_unexport(gpio);
                                 break;
                         case 'e':
                                 gpio = atoi(optarg);
                                 gpio_export(gpio);
-                                gpio_direction(gpio, 0);
+                                pinMode(gpio, 0);
                                 gpio_unexport(gpio);
                                 break;
                      
@@ -385,13 +385,13 @@ int main(int argc, char **argv)
                         case 'j':
                                 gpio = atoi(optarg);
                                 gpio_export(gpio);
-                                gpio_write(gpio, 1);
+                                digitalWrite(gpio, 1);
                                 gpio_unexport(gpio);
                                 break;
                         case 'l':
                                 gpio = atoi(optarg);
                                 gpio_export(gpio);
-                                gpio_write(gpio, 0);
+                                digitalWrite(gpio, 0);
                                 gpio_unexport(gpio);
                                 break;
                         case 'a':
@@ -411,7 +411,7 @@ int main(int argc, char **argv)
                         case 'g':
                                 gpio = atoi(optarg);
                                 gpio_export(gpio);
-                                printf("gpio%d=%d\n", gpio, gpio_read(gpio));
+                                printf("gpio%d=%d\n", gpio, digitalRead(gpio));
                                 gpio_unexport(gpio);
                                 break;
                         case 'p':
@@ -454,7 +454,7 @@ int main(int argc, char **argv)
                 model = get_model();
                 printf("model=0x%X\n", model);
                 gpio_export(44);
-                printf("bootmode=0x%X\n", gpio_read(44) ? 1:0);
+                printf("bootmode=0x%X\n", digitalRead(44) ? 1:0);
                 printf("fpga_revision=0x%X\n", fpeek8(twifd, 0x7F));
                 gpio_unexport(44);
         }
