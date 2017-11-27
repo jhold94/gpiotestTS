@@ -270,6 +270,41 @@ int get_model()
         return strtoull(ptr+3, NULL, 16);
 }
 
+void dac(int dacpin, int value)
+{
+	value = value * 360;
+	switch(dacpin) {
+		case '0':
+			char buf[2];
+        			buf[0] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 9) & 0xf);
+				buf[1] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 1) & 0xff);
+				fpoke8(twifd, 0x2E, buf[0]);
+				fpoke8(twifd, 0x2F, buf[1]);
+		case '1' :
+			char buf[2];
+                		buf[0] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 9) & 0xf);
+                		buf[1] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 1) & 0xff);
+                		fpoke8(twifd, 0x30, buf[0]);
+                		fpoke8(twifd, 0x31, buf[1]);
+		case '2' :
+			char buf[2];
+				buf[0] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 9) & 0xf);
+				buf[1] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 1) & 0xff);
+				fpoke8(twifd, 0x32, buf[0]);
+				fpoke8(twifd, 0x33, buf[1]);
+		case '3' :
+			char buf[2];
+				buf[0] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 9) & 0xf);
+				buf[1] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 1) & 0xff);
+				fpoke8(twifd, 0x34, buf[0]);
+				fpoke8(twifd, 0x35, buf[1]);
+		default :
+			return 1;
+	}
+}
+			
+	
+
 /********************************************************************************/
 // Usage & Main Function 
 /********************************************************************************/
@@ -394,7 +429,7 @@ int main(int argc, char **argv)
                                 digitalWrite(gpio, 0);
                                 gpio_unexport(gpio);
                                 break;
-                        case 'a':
+			case 'a':
                                 opt_dac0 = ((strtoul(optarg, NULL, 0) & 0xfff)<<1)|0x1;
                                 break;
                         case 'b':
