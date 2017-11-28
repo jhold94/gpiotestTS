@@ -78,7 +78,7 @@ fi
   echo "ts7680ctl Library"
   cd ts7680ctl
   echo "Made it to the first"
-  $make uninstall
+ # $make uninstall
   echo "Made it after"
   if [ x$1 = "xstatic" ]; then
     make -j5 static
