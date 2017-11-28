@@ -274,32 +274,36 @@ int dac(int dacpin, int value)
 {
 	value = value * 360;
 	switch(dacpin) {
-		case '0': {
+		case '0': 
 			char buf[2];
         			buf[0] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 9) & 0xf);
 				buf[1] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 1) & 0xff);
 				fpoke8(twifd, 0x2E, buf[0]);
-				fpoke8(twifd, 0x2F, buf[1]);}
-		case '1' : {
+				fpoke8(twifd, 0x2F, buf[1]);
+			break;
+		case '1' : 
 			char buf[2];
                 		buf[0] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 9) & 0xf);
                 		buf[1] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 1) & 0xff);
                 		fpoke8(twifd, 0x30, buf[0]);
-                		fpoke8(twifd, 0x31, buf[1]);}
-		case '2' : {
+                		fpoke8(twifd, 0x31, buf[1]);
+			break;
+		case '2' : 
 			char buf[2];
 				buf[0] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 9) & 0xf);
 				buf[1] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 1) & 0xff);
 				fpoke8(twifd, 0x32, buf[0]);
-				fpoke8(twifd, 0x33, buf[1]);}
-		case '3' : {
+				fpoke8(twifd, 0x33, buf[1]);
+			break;
+		case '3' : 
 			char buf[2];
 				buf[0] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 9) & 0xf);
 				buf[1] = ((((strtoul(value, NULL, 0) & 0xfff)<<1)|0x1 >> 1) & 0xff);
 				fpoke8(twifd, 0x34, buf[0]);
-				fpoke8(twifd, 0x35, buf[1]);}
-		default : {
-			return 1;}
+				fpoke8(twifd, 0x35, buf[1]);
+			break;
+		default : 
+			return 1;
 	}
 }
 			
