@@ -316,6 +316,7 @@ int analogInMode(int adcpin, int mode)
 	unsigned int i, x, meas_mV, meas_mA;
         unsigned long long chan[8] = {0,0,0,0,0,0,0,0};
 	int devmem;
+	bool mv, ma;
         
         devmem = open("/dev/mem", O_RDWR|O_SYNC);
 	assert(devmem != -1);
