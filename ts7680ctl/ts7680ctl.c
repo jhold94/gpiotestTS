@@ -384,10 +384,10 @@ int analogInMode(int adcpin, int mode)
         }
         
 	if(mode == mv) {
-		meas_mV = ((((chan[pinadc]/10)*45177)*6235)/100000000);
+		meas_mV = ((((chan[adcpin]/10)*45177)*6235)/100000000);
 		return meas_mV; }
 	if(mode == ma) {
-		meas_mV = ((((chan[pinadc]/10)*45177)*6235)/100000000);
+		meas_mV = ((((chan[adcpin]/10)*45177)*6235)/100000000);
 		meas_mA = (((meas_mV)*1000)/240); }
 	else {
 		return 0; }                
