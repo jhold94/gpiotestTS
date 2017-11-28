@@ -11,5 +11,6 @@ int digitalWrite(int gpio, int val);
 int gpio_setedge(int gpio, int rising, int falling);
 int gpio_select(int gpio);
 int dac(int dacpin, int value);
-int analogInMode(int adcpin, int mode)
+int analogInMode(int adcpin, int mode);
+int ts7680Setup(void);
 #endif //_GPIOLIB_H_
