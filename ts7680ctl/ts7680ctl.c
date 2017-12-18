@@ -86,24 +86,30 @@ uint8_t fpeek8(int twifd, uint16_t addr)
 /********************************************************************************/
 int pinMode(int gpio, int dir)
 {
-        int ret = 0;
-        char buf[50];
-        sprintf(buf, "/sys/class/gpio/gpio%d/direction", gpio);
-        int gpiofd = open(buf, O_WRONLY);
-        if(gpiofd < 0) {
-                perror("Couldn't open IRQ file");
-                ret = -1;
-        }
-        
-        if(dir == 1 && gpiofd){
-                if (3 != write(gpiofd, "out", 3)) {
-                        perror("Couldn't set GPIO direction to out");
-                        ret = -2;
-                }
-        }
-        
-        close(gpiofd);
-        return ret;
+	int ret = 0;
+	char buf[50];
+	sprintf(buf, "/sys/class/gpio/gpio%d/direction", gpio);
+	int gpiofd = open(buf, O_WRONLY);
+	if(gpiofd < 0) {
+		perror("Couldn't open IRQ file");
+		ret = -1;
+	}
+
+	if(dir == 1 && gpiofd){
+		if (3 != write(gpiofd, "out", 3)) {
+			perror("Couldn't set GPIO direction to out");
+			ret = -2;
+		}
+	}
+	else if(gpiofd) {
+		if(2 != write(gpiofd, "in", 2)) {
+			perror("Couldn't set GPIO directio to in");
+			ret = -3;
+		}
+	}
+
+	close(gpiofd);
+	return ret;
 }
 
 int gpio_setedge(int gpio, int rising, int falling)
